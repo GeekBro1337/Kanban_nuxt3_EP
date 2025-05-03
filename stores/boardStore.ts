@@ -1,26 +1,38 @@
 import { defineStore } from 'pinia'
 import boardData from '~/data/board.json'
 import { useStorage } from '@vueuse/core'
-import { ref } from 'vue'
-
+import { ref, computed } from 'vue'
+  
 export const useBoardStore = defineStore('boardStore', () => {
-  const board = useStorage('board',boardData) // Используем useStorage для сохранения состояния в localStorage(Хотя я думаю что это можно было сделать через pinia)
-
+  const board = useStorage('board', boardData)
+  
   function addColumn(columnName: string) {
     board.value.columns.push({
-      id: Date.now().toString(), // Добавляем уникальный id
+      id: Date.now().toString(),
       name: columnName,
       tasks: []
     })
   }
-
-  function deleteColumn(columnIndex:number) {
+  
+  function deleteColumn(columnIndex: number) {
     board.value.columns.splice(columnIndex, 1)
   }
+  
+  // Функция для получения задачи по ID
+  // В файле boardStore.js или boardStore.ts
+function getTaskById(taskId) {
+  for (const column of board.value.columns) {
+    const task = column.tasks.find(task => task.id === taskId);
+    if (task) return task;
+  }
+  return null;
+}
 
+  // И не забудьте вернуть эту функцию в return
   return {
     board,
     addColumn,
-    deleteColumn
+    deleteColumn,
+    getTaskById
   }
 })
